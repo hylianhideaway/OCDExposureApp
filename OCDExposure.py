@@ -18,8 +18,7 @@ class OCDExposureApp(tk.Tk):
         self.start_time = None
         self.running = False
         self.elapsed_time = 0
-
-        # List to hold (time, rating) pairs
+        #Stores user data
         self.data = []
 
         # Build the user interface
@@ -110,13 +109,13 @@ class OCDExposureApp(tk.Tk):
     
     def update_data_display(self,current_time, rating):
         """
-        Display the pairs in the text widget
+        Adds a new data entry pair to the widget
         and automatically scroll so the new text is visible.
         """
         self.data_text.config(state='normal')
         #self.data_text.delete(1.0, tk.END)
         
-        self.data_text.insert(tk.END,  self.get_DisplayTime_String(current_time)+f": {rating}\n")
+        self.data_text.insert(tk.END,  self.get_DisplayTime_String(current_time)+f"   {rating}\n")
         
         # Scroll to the bottom (end) of the text widget
         self.data_text.see(tk.END)
