@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import time
 import csv
+from datetime import date
 import matplotlib.pyplot as plt
 
 class OCDExposureApp(tk.Tk):
@@ -143,6 +144,13 @@ class OCDExposureApp(tk.Tk):
             dataset_text.insert(tk.END, f"{t:.2f}, {rating}\n")
         dataset_text.config(state='disabled')
 
+                # Button to save results
+        save_button = tk.Button(results_window, text="Save Results", font=("Helvetica", 14),
+                                command=self.save_results)
+        save_button.pack(pady=10)
+
+
+
         # If data is present, plot it
         if self.data:
             times, ratings = zip(*self.data)
@@ -151,13 +159,8 @@ class OCDExposureApp(tk.Tk):
             ax.set_xlabel("Time (s)")
             ax.set_ylabel("Rating")
             ax.set_ylim(0, 11)  # y-axis from 0 to 10
-            ax.set_title("Rating over Time")
+            ax.set_title(str(date.today())+"   Rating over Time")
             plt.show()
-
-        # Button to save results
-        save_button = tk.Button(results_window, text="Save Results", font=("Helvetica", 14),
-                                command=self.save_results)
-        save_button.pack(pady=10)
 
     def save_results(self):
         """
@@ -175,9 +178,9 @@ class OCDExposureApp(tk.Tk):
 
 
     def  get_DisplayTime_String(self,seconds:float):
-        min = seconds//60
-        remainingSeconds = seconds%60
-        return f"{min:.0f}:{remainingSeconds:.0f}"
+        min = int(seconds//60)
+        remainingSeconds = int(seconds%60)
+        return f"{min:02d}:{remainingSeconds:02d}"
 
 
 
