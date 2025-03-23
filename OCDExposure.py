@@ -19,7 +19,7 @@ class OCDExposureApp(tk.Tk):
         self.start_time = None
         self.running = False
         self.elapsed_time = 0
-        #Stores user data
+        # Stores user data (time, rating)
         self.data = []
 
         # Build the user interface
@@ -29,6 +29,8 @@ class OCDExposureApp(tk.Tk):
         self.update_timer()
 
     def create_widgets(self):
+        """Creates and arranges the widgets in the main window."""
+
         # Stopwatch label (shows elapsed time)
         self.timer_label = tk.Label(self, text="0", font=("Helvetica", 24))
         self.timer_label.grid(row=0, column=0, columnspan=4, pady=10)
@@ -39,7 +41,7 @@ class OCDExposureApp(tk.Tk):
         self.data_text = tk.Text(self.data_frame, width=40, height=5, state='disabled', font=("Helvetica", 12))
         self.data_text.pack()
 
-        # Buttons for ratings 1–10
+        # Rating buttons (1–10)
         self.buttons = {}
         numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         positions = {
@@ -61,20 +63,14 @@ class OCDExposureApp(tk.Tk):
         self.start_stop_button.grid(row=5, column=1, padx=5, pady=5)
 
     def update_timer(self):
-        """
-        Periodically update the displayed time if the timer is running.
-        """
+        """Periodically updates the displayed time if the timer is running."""
         if self.running:
             self.elapsed_time = time.time() - self.start_time
-            # Show whole seconds only
             self.timer_label.config(text=f"{self.get_DisplayTime_String(self.elapsed_time)}")
         self.after(100, self.update_timer)
 
     def toggle_timer(self):
-        """
-        Start the timer if it's not running, or stop the timer if it is.
-        Once stopped, immediately show the results.
-        """
+        """Starts or stops the timer. When stopped, shows the results."""
         if not self.running:
             self.start_timer()
             self.start_stop_button.config(text="Stop")
@@ -84,51 +80,33 @@ class OCDExposureApp(tk.Tk):
             self.show_results()
 
     def start_timer(self):
-        """
-        Begin (or resume) timing.
-        """
+        """Begins or resumes timing."""
         if not self.running:
             self.running = True
-            # Adjust start_time for already elapsed_time (if any), so it can resume.
             self.start_time = time.time() - self.elapsed_time
 
     def stop_timer(self):
-        """
-        Stop the timer.
-        """
+        """Stops the timer."""
         self.running = False
 
     def record_rating(self, rating):
-        """
-        Record a rating if the timer is running, along with the current elapsed time.
-        """
+        """Records a rating if the timer is running, along with the current elapsed time."""
         if self.running:
             current_time = time.time() - self.start_time
             self.data.append((current_time, rating))
             self.update_data_display(current_time, rating)
 
-    
-    def update_data_display(self,current_time, rating):
-        """
-        Adds a new data entry pair to the widget
-        and automatically scroll so the new text is visible.
-        """
+    def update_data_display(self, current_time, rating):
+        """Adds a new data entry pair to the widget and automatically scrolls to make the new text visible."""
         self.data_text.config(state='normal')
-        #self.data_text.delete(1.0, tk.END)
-        
-        self.data_text.insert(tk.END,  self.get_DisplayTime_String(current_time)+f"   {rating}\n")
-        
-        # Scroll to the bottom (end) of the text widget
+        self.data_text.insert(tk.END, f"{self.get_DisplayTime_String(current_time)}   {rating}\n")
         self.data_text.see(tk.END)
-        
         self.data_text.config(state='disabled')
 
     def show_results(self):
-        """
-        Open a new window showing the full dataset and a simple plot of time vs. rating.
-        Also provide a button to save the data as CSV.
-        """
-        # Disable rating buttons once results are shown
+        """Opens a new window showing the dataset and a plot, with a save button."""
+
+        # Disable rating buttons and start/stop button once results are shown
         for btn in self.buttons.values():
             btn.config(state='disabled')
         self.start_stop_button.config(state='disabled')
@@ -139,17 +117,15 @@ class OCDExposureApp(tk.Tk):
         # Display the full dataset in a text widget
         dataset_text = tk.Text(results_window, width=50, height=15, font=("Helvetica", 12))
         dataset_text.pack(pady=10)
-        dataset_text.insert(tk.END, "Time (s), Rating\n")
+        dataset_text.insert(dataset_text.END, "Time (s), Rating\n")
         for t, rating in self.data:
-            dataset_text.insert(tk.END, f"{t:.2f}, {rating}\n")
+            dataset_text.insert(dataset_text.END, f"{t:.2f}, {rating}\n")
         dataset_text.config(state='disabled')
 
-                # Button to save results
+        # Button to save results
         save_button = tk.Button(results_window, text="Save Results", font=("Helvetica", 14),
                                 command=self.save_results)
         save_button.pack(pady=10)
-
-
 
         # If data is present, plot it
         if self.data:
@@ -163,9 +139,7 @@ class OCDExposureApp(tk.Tk):
             plt.show()
 
     def save_results(self):
-        """
-        Prompt the user for a filename and save the data to a CSV file.
-        """
+        """Prompts the user for a filename and saves the data to a CSV file."""
         filename = filedialog.asksaveasfilename(defaultextension=".csv",
                                                 filetypes=[("CSV Files", "*.csv")])
         if filename:
@@ -176,13 +150,11 @@ class OCDExposureApp(tk.Tk):
                     writer.writerow([f"{t:.2f}", rating])
             messagebox.showinfo("Save", "Results saved successfully!")
 
-
-    def  get_DisplayTime_String(self,seconds:float):
-        min = int(seconds//60)
-        remainingSeconds = int(seconds%60)
-        return f"{min:02d}:{remainingSeconds:02d}"
-
-
+    def get_DisplayTime_String(self, seconds: float):
+        """Converts seconds to a formatted time string (MM:SS)."""
+        minutes = int(seconds // 60)
+        remaining_seconds = int(seconds % 60)
+        return f"{minutes:02d}:{remaining_seconds:02d}"
 
 if __name__ == "__main__":
     app = OCDExposureApp()
