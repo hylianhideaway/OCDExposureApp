@@ -117,9 +117,9 @@ class OCDExposureApp(tk.Tk):
         # Display the full dataset in a text widget
         dataset_text = tk.Text(results_window, width=50, height=15, font=("Helvetica", 12))
         dataset_text.pack(pady=10)
-        dataset_text.insert(dataset_text.END, "Time (s), Rating\n")
+        dataset_text.insert(tk.END, "Time (s), Rating\n")
         for t, rating in self.data:
-            dataset_text.insert(dataset_text.END, f"{t:.2f}, {rating}\n")
+            dataset_text.insert(tk.END, f"{t:.2f}, {rating}\n")
         dataset_text.config(state='disabled')
 
         # Button to save results
